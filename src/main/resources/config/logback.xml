@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+scan：当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true。
+scanPeriod：设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒当scan为true时，此属性生效。默认的时间间隔为1分钟。
+debug：当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false。
+-->
+<configuration scan="false" scanPeriod="60 seconds" debug="false">
+    <!-- 定义日志的根目录 (此路径会生成eclipse根目录的相对路径，生产环境建议配合环境变量使用绝对路径)-->
+    <property name="LOG_HOME" value="../logs" />
+    <!-- 定义日志文件名称 -->
+    <property name="appName" value="face-gun"></property>
+
+    <!-- 控制台输出日志 -->
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder charset="UTF-8">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{26} - %msg%n</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- 文件输出日志(Default) -->
+    <appender name="default-log-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/${appName}/sys.log</File>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${appName}/sys.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+            <maxHistory>60</maxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <Pattern>[%d{HH:mm:ss}] [%thread] |%level| %marker %logger{50} [%line] -> %X{rpid} %msg %n%ex</Pattern>
+        </encoder>
+    </appender>
+
+
+    <!-- 文件输出日志(ERROR) -->
+    <appender name="error-file" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <File>${LOG_HOME}/${appName}/error.log</File>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>error</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_HOME}/${appName}/error.%d{yyyy-MM-dd}.log.zip</fileNamePattern>
+            <maxHistory>12</maxHistory>
+        </rollingPolicy>
+        <encoder charset="UTF-8">
+            <Pattern>[%d{dd|HH:mm:ss}] [%thread] |%level| %marker %logger{50} [%line] -> %X{rpid} %msg %n%ex</Pattern>
+        </encoder>
+    </appender>
+
+    <!-- Spring framework logger -->
+    <logger name="org.springframework" level="error" />
+
+    <logger name="ch.qos.logback" level="ERROR" />
+    <logger name="com.qkt.face" level="DEBUG" />
+    <logger name="org.apache.mina" level="INFO" />
+    <logger name="io.netty" level="INFO" />
+    <logger name="io.lettuce" level="ERROR" />
+
+    <root level="INFO">
+        <appender-ref ref="stdout"/>
+        <appender-ref ref="default-log-file"/>
+        <appender-ref ref="error-file"/>
+    </root>
+</configuration>
