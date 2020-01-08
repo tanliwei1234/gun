@@ -6,6 +6,6 @@ import org.springframework.stereotype.Service;
 /**
  * 场景设别服务类
  */
-@Service
+@Service("sceneDeviceServiceImpl")
 public class SceneDeviceServiceImpl implements SceneDeviceService {
 }
